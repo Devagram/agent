@@ -24,6 +24,7 @@ jobs:
       VERTEX_LOCATION: ${{ vars.VERTEX_LOCATION }}
       VERTEX_MODEL: ${{ vars.VERTEX_MODEL }}
       REPO_TOKEN_SECRET: ${{ vars.REPO_TOKEN_SECRET }}
+      AR_REPO: ${{ vars.AR_REPO }}
 
     steps:
       - name: Checkout
@@ -48,6 +49,7 @@ jobs:
           : "${SITEGEN_SKELETON_GIT_URL:?Missing vars.SITEGEN_SKELETON_GIT_URL}"
           : "${SITEGEN_SKELETON_REF:?Missing vars.SITEGEN_SKELETON_REF}"
           : "${REPO_TOKEN_SECRET:?Missing vars.REPO_TOKEN_SECRET}"
+          : "${AR_REPO:?Missing vars.AR_REPO (e.g. sitegen)}"
 
       # Build and push via Cloud Build (no Docker-in-Docker)
       - name: Build container (Cloud Build)
@@ -56,7 +58,10 @@ jobs:
           set -euo pipefail
           gcloud config set project "$GCP_PROJECT_ID"
 
-          BUILD_ID=$(gcloud builds submit --tag "gcr.io/$GCP_PROJECT_ID/sitegen-agent:latest" --timeout=1200 --async --format='value(id)')
+          IMAGE="${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/${AR_REPO}/sitegen-agent:latest"
+          echo "Building image: $IMAGE"
+
+          BUILD_ID=$(gcloud builds submit --tag "$IMAGE" --timeout=1200 --async --format='value(id)')
           echo "Cloud Build started: $BUILD_ID"
 
           # Poll for completion without streaming logs (avoids extra viewer permissions).
@@ -80,13 +85,15 @@ jobs:
           set -euo pipefail
           gcloud config set project "$GCP_PROJECT_ID"
 
+          IMAGE="${GCP_REGION}-docker.pkg.dev/${GCP_PROJECT_ID}/${AR_REPO}/sitegen-agent:latest"
+
           ENV_VARS="GOOGLE_CLOUD_PROJECT=$GCP_PROJECT_ID,SITEGEN_SKELETON_GIT_URL=$SITEGEN_SKELETON_GIT_URL,SITEGEN_SKELETON_REF=$SITEGEN_SKELETON_REF"
           if [[ -n "${VERTEX_LOCATION:-}" ]]; then ENV_VARS+=" ,VERTEX_LOCATION=$VERTEX_LOCATION"; fi
           if [[ -n "${VERTEX_MODEL:-}" ]]; then ENV_VARS+=" ,VERTEX_MODEL=$VERTEX_MODEL"; fi
           ENV_VARS=${ENV_VARS// /}
 
           gcloud run deploy "$CLOUD_RUN_SERVICE" \
-            --image "gcr.io/$GCP_PROJECT_ID/sitegen-agent:latest" \
+            --image "$IMAGE" \
             --region "$GCP_REGION" \
             --platform managed \
             --allow-unauthenticated \

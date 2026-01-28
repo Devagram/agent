@@ -39,6 +39,7 @@ Create these **variables**:
 - `SITEGEN_SKELETON_GIT_URL`: `https://github.com/Devagram/skeleton.git`
 - `SITEGEN_SKELETON_REF`: `main`
 - `REPO_TOKEN_SECRET`: Secret Manager secret name (example: `github-readonly-token`)
+- `AR_REPO`: Artifact Registry repo name (Docker), e.g. `sitegen`
 
 Optional:
 - `VERTEX_LOCATION`: `us-central1`
@@ -179,6 +180,7 @@ In `Devagram/agent` repo:
 - `SITEGEN_SKELETON_GIT_URL=https://github.com/Devagram/skeleton.git`
 - `SITEGEN_SKELETON_REF=main`
 - `REPO_TOKEN_SECRET=github-readonly-token`
+- `AR_REPO=sitegen`
 
 **Settings → Secrets and variables → Actions → Secrets**:
 - `WIF_PROVIDER=projects/1074593120244/locations/global/workloadIdentityPools/github-pool/providers/github-provider`
@@ -198,6 +200,7 @@ The workflow in this repo expects:
   - `SITEGEN_SKELETON_GIT_URL`
   - `SITEGEN_SKELETON_REF`
   - `REPO_TOKEN_SECRET`
+  - `AR_REPO`
 
 - These to be set as **GitHub Actions Secrets**:
   - `WIF_PROVIDER`
