@@ -55,7 +55,24 @@ jobs:
         run: |
           set -euo pipefail
           gcloud config set project "$GCP_PROJECT_ID"
-          gcloud builds submit --tag "gcr.io/$GCP_PROJECT_ID/sitegen-agent:latest" --timeout=1200
+
+          BUILD_ID=$(gcloud builds submit --tag "gcr.io/$GCP_PROJECT_ID/sitegen-agent:latest" --timeout=1200 --async --format='value(id)')
+          echo "Cloud Build started: $BUILD_ID"
+
+          # Poll for completion without streaming logs (avoids extra viewer permissions).
+          while true; do
+            STATUS=$(gcloud builds describe "$BUILD_ID" --format='value(status)')
+            echo "Cloud Build status: $STATUS"
+            if [[ "$STATUS" == "SUCCESS" ]]; then
+              break
+            fi
+            if [[ "$STATUS" == "FAILURE" || "$STATUS" == "CANCELLED" || "$STATUS" == "EXPIRED" ]]; then
+              echo "Build failed (status=$STATUS)."
+              echo "Open logs: https://console.cloud.google.com/cloud-build/builds/$BUILD_ID?project=$GCP_PROJECT_ID"
+              exit 1
+            fi
+            sleep 10
+          done
 
       - name: Deploy to Cloud Run
         shell: bash
