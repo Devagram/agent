@@ -17,7 +17,25 @@ This wrapper is intentionally small; the heavy lifting lives in the pipeline mod
 
 ## Environment variables
 
+### Required for Cloud Run
 - `GOOGLE_CLOUD_PROJECT` (required in Cloud Run)
+
+### Skeleton resolution (new post-split behavior)
+The agent can fetch the skeleton in multiple ways (in order of precedence):
+
+1. **Request-level override** (local/dev only):
+   - `skeletonPath` in the request body → use that local path
+2. **Runtime git clone** (recommended for Cloud Run):
+   - `SITEGEN_SKELETON_GIT_URL` → clone this repo at runtime (e.g. `https://github.com/<USERNAME>/sitegen-skeleton.git`)
+   - `SITEGEN_SKELETON_REF` → branch/tag to clone (default: `main`)
+   - `GITHUB_TOKEN` → token for private repo access (injected from Secret Manager)
+3. **Baked-in or mounted path** (legacy/fallback):
+   - `SITEGEN_SKELETON_DIR` → use this path
+   - Or falls back to `/workspace` (if mounted) or `/app/skeleton` (if baked into image)
+
+**📖 See**: [docs/CLOUD_RUN_DEPLOY.md](./docs/CLOUD_RUN_DEPLOY.md) for detailed Cloud Run setup with Secret Manager.
+
+### Vertex AI (for ADK plan generation)
 - `VERTEX_LOCATION` (default: `us-central1`)
 - `VERTEX_MODEL` (default: `gemini-1.5-pro`)
 
@@ -88,6 +106,14 @@ Expected response:
 ```json
 {"previewUrl":"https://...web.app","channelId":"hanks-sushi-truck-r1"}
 ```
+
+## CI/CD (GitHub Actions → Cloud Run)
+
+This repo includes workflows to:
+- run tests on PRs
+- deploy to Cloud Run on pushes to `main`
+
+See: `docs/CI_CD_CLOUD_RUN.md`
 
 ## Notes
 

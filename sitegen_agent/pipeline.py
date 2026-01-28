@@ -77,6 +77,11 @@ def _build_site(staged: Path) -> None:
 
 def _deploy_preview(*, staged: Path, firebase_project_id: str, channel_id: str) -> DeployResult:
     # Prefer machine-readable output so we don't depend on Firebase CLI formatting.
+    # Auth: firebase-tools supports FIREBASE_TOKEN for non-interactive auth (local dev / CI).
+    env: dict[str, str] = {}
+    if os.environ.get("FIREBASE_TOKEN"):
+        env["FIREBASE_TOKEN"] = os.environ["FIREBASE_TOKEN"]
+
     out = _run(
         [
             "firebase",
@@ -87,6 +92,7 @@ def _deploy_preview(*, staged: Path, firebase_project_id: str, channel_id: str) 
             "--json",
         ],
         cwd=staged,
+        env=env or None,
     )
 
     # First try: parse JSON output produced by firebase-tools.
@@ -165,6 +171,38 @@ def _generate_page_plan_via_vertex(req: Mapping[str, Any], *, generator_dir: Pat
         raise RuntimeError(f"ADK generator did not output valid JSON.\n\n{out[:2000]}") from e
 
 
+def _clone_skeleton_into_workdir(workdir: Path) -> Path:
+    """Clone the SITEGEN_SKELETON_GIT_URL into the provided workdir and return the clone path.
+
+    Honors SITEGEN_SKELETON_REF (branch) and GITHUB_TOKEN for private repos.
+    """
+    git_url = os.environ.get("SITEGEN_SKELETON_GIT_URL")
+    if not git_url:
+        raise RuntimeError("SITEGEN_SKELETON_GIT_URL is not set")
+
+    ref = os.environ.get("SITEGEN_SKELETON_REF", "main")
+    token = os.environ.get("GITHUB_TOKEN")
+
+    clone_url = git_url
+    # If a token is provided, inject it into the https URL so git can authenticate.
+    # Only do this for https URLs that don't already contain credentials.
+    if token and clone_url.startswith("https://"):
+        parts = clone_url.split("https://", 1)
+        if parts[1] and "@" not in parts[1]:
+            clone_url = f"https://x-access-token:{token}@{parts[1]}"
+
+    # Prepare clone destination
+    clone_dest = workdir / "skeleton_clone"
+
+    # Ensure git is available
+    _require_cmd("git")
+
+    # Clone shallow to save time/space
+    _run(["git", "clone", "--depth", "1", "--branch", ref, clone_url, str(clone_dest)], cwd=workdir)
+
+    return clone_dest
+
+
 def generate_and_deploy_preview(req: Mapping[str, Any]) -> dict[str, str]:
     firebase_project_id = (
         str(req.get("firebaseProjectId"))
@@ -180,17 +218,28 @@ def generate_and_deploy_preview(req: Mapping[str, Any]) -> dict[str, str]:
 
     channel_id = str(req.get("channelId")) if req.get("channelId") else _default_channel_id(project_name)
 
-    # Skeleton resolution:
-    # - Cloud Run: the image bakes a copy of the skeleton at /app/skeleton.
-    # - Local docker-compose: /workspace may be mounted read-only.
-    # - Request can override via skeletonPath.
-    default_skeleton = os.environ.get("SITEGEN_SKELETON_DIR") or (
-        "/workspace" if Path("/workspace").exists() else "/app/skeleton"
-    )
-    skeleton_path = Path(str(req.get("skeletonPath") or default_skeleton))
+    # Skeleton resolution (new behavior):
+    # 1. If request includes `skeletonPath`, use it (local/dev).
+    # 2. Else if SITEGEN_SKELETON_GIT_URL is set, clone it into the temp workdir at SITEGEN_SKELETON_REF.
+    # 3. Else fall back to SITEGEN_SKELETON_DIR or existing baked-in locations (/workspace or /app/skeleton).
+    env_skeleton_dir = os.environ.get("SITEGEN_SKELETON_DIR")
+    baked_default = "/workspace" if Path("/workspace").exists() else "/app/skeleton"
 
     with tempfile.TemporaryDirectory(prefix="sitegen-") as tmp:
         workdir = Path(tmp)
+
+        # Determine source of the skeleton
+        req_skeleton = req.get("skeletonPath")
+        if req_skeleton:
+            skeleton_path = Path(str(req_skeleton))
+        elif os.environ.get("SITEGEN_SKELETON_GIT_URL"):
+            # Clone into workdir and use the clone as the skeleton source
+            cloned = _clone_skeleton_into_workdir(workdir)
+            skeleton_path = cloned
+        else:
+            default_skeleton = env_skeleton_dir or baked_default
+            skeleton_path = Path(default_skeleton)
+
         staged = _stage_skeleton(skeleton_path, workdir)
 
         plan = req.get("pagePlanJson")

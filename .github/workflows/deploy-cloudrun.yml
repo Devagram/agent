@@ -1,0 +1,79 @@
+name: Deploy to Cloud Run (sitegen-agent)
+
+"on":
+  push:
+    branches: [main]
+
+concurrency:
+  group: cloudrun-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    env:
+      GCP_REGION: ${{ vars.GCP_REGION }}
+      GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+      CLOUD_RUN_SERVICE: ${{ vars.CLOUD_RUN_SERVICE }}
+      SITEGEN_SKELETON_GIT_URL: ${{ vars.SITEGEN_SKELETON_GIT_URL }}
+      SITEGEN_SKELETON_REF: ${{ vars.SITEGEN_SKELETON_REF }}
+      VERTEX_LOCATION: ${{ vars.VERTEX_LOCATION }}
+      VERTEX_MODEL: ${{ vars.VERTEX_MODEL }}
+      REPO_TOKEN_SECRET: ${{ vars.REPO_TOKEN_SECRET }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud (OIDC)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.DEPLOYER_SERVICE_ACCOUNT }}
+
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Validate required vars
+        shell: bash
+        run: |
+          set -euo pipefail
+          : "${GCP_PROJECT_ID:?Missing vars.GCP_PROJECT_ID}"
+          : "${GCP_REGION:?Missing vars.GCP_REGION}"
+          : "${CLOUD_RUN_SERVICE:?Missing vars.CLOUD_RUN_SERVICE}"
+          : "${SITEGEN_SKELETON_GIT_URL:?Missing vars.SITEGEN_SKELETON_GIT_URL}"
+          : "${SITEGEN_SKELETON_REF:?Missing vars.SITEGEN_SKELETON_REF}"
+          : "${REPO_TOKEN_SECRET:?Missing vars.REPO_TOKEN_SECRET}"
+
+      # Build and push via Cloud Build (no Docker-in-Docker)
+      - name: Build container (Cloud Build)
+        shell: bash
+        run: |
+          set -euo pipefail
+          gcloud config set project "$GCP_PROJECT_ID"
+          gcloud builds submit --tag "gcr.io/$GCP_PROJECT_ID/sitegen-agent:latest" --timeout=1200
+
+      - name: Deploy to Cloud Run
+        shell: bash
+        run: |
+          set -euo pipefail
+          gcloud config set project "$GCP_PROJECT_ID"
+
+          ENV_VARS="GOOGLE_CLOUD_PROJECT=$GCP_PROJECT_ID,SITEGEN_SKELETON_GIT_URL=$SITEGEN_SKELETON_GIT_URL,SITEGEN_SKELETON_REF=$SITEGEN_SKELETON_REF"
+          if [[ -n "${VERTEX_LOCATION:-}" ]]; then ENV_VARS+=" ,VERTEX_LOCATION=$VERTEX_LOCATION"; fi
+          if [[ -n "${VERTEX_MODEL:-}" ]]; then ENV_VARS+=" ,VERTEX_MODEL=$VERTEX_MODEL"; fi
+          ENV_VARS=${ENV_VARS// /}
+
+          gcloud run deploy "$CLOUD_RUN_SERVICE" \
+            --image "gcr.io/$GCP_PROJECT_ID/sitegen-agent:latest" \
+            --region "$GCP_REGION" \
+            --platform managed \
+            --allow-unauthenticated \
+            --memory "2Gi" \
+            --timeout "600" \
+            --set-env-vars "$ENV_VARS" \
+            --set-secrets "GITHUB_TOKEN=${REPO_TOKEN_SECRET}:latest"

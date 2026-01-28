@@ -1,263 +1,184 @@
 # Repo Split Plan — `sitegen-skeleton` → (A) `sitegen-skeleton` + (B) `sitegen-agent`
 
-This doc is a **step-by-step, do-this-next checklist** to split the current monorepo into two repos (recommended Option A):
+This document is a single, actionable checklist to split the monorepo into two repos and finish the Cloud Run agent work.
 
-- **Renderer repo**: `sitegen-skeleton` (Astro + section library + schemas + validation + Firebase hosting config)
-- **Agent repo**: `sitegen-agent` (FastAPI + ADK + Cloud Run + Firebase preview deploy)
+Last updated: 2026-01-27
 
-It also shows how to keep both repos open in **one WebStorm project** for maximum Copilot context.
-
-> Decisions locked in (per current plan)
-> - **Strategy A1**: agent fetches skeleton by **`git clone` at runtime**.
-> - Both repos are **private**.
-> - Skeleton pinning is **branch-based** for now (later you should move to immutable tags/SHAs).
+Checklist legend:
+- [x] Done
+- [ ] Todo / pending
 
 ---
 
 ## 0) Preconditions / decisions (5 minutes)
-
-Make these decisions first so you don’t redo work:
-
-1. GitHub repo names
-   - `sitegen-skeleton` (renderer)
-   - `sitegen-agent` (cloud service)
-2. Visibility
-   - [x] Both repos will be **private**.
-3. Skeleton consumption strategy (agent)
-   - [x] **A1**: agent clones the skeleton at runtime using a pinned **branch** (temporary).
-   - Avoid relying on `/workspace` in Cloud Run.
-4. GitHub account
-   - You **do not** need an org for this. Plan assumes a personal GitHub username.
-   - Throughout this doc, replace `<GITHUB_USERNAME>` with your GitHub username.
-
----
+- [x] Decide GitHub repo names: `sitegen-skeleton` (renderer) and `sitegen-agent` (agent)
+- [x] Decide visibility: both repos private
+- [x] Skeleton consumption strategy: A1 — agent clones skeleton at runtime (branch pin for now)
+- [x] GitHub account decision: personal account assumed (replace `<GITHUB_USERNAME>` in commands)
 
 ## 0.1) One-time tool install (Windows)
-
-### Install `git-filter-repo`
-
-Preferred (Python/pip):
-
-```powershell
-python -m pip install --user git-filter-repo
-```
-
-Validate:
-
-```powershell
-git filter-repo --help
-```
-
-If `git filter-repo` isn’t found after install, ensure your user Scripts path is on PATH (or re-open the terminal).
+- [x] Install `git-filter-repo` (recommended):
+  - `python -m pip install --user git-filter-repo`
+  - Validate: `git filter-repo --help`
 
 ---
 
 ## 2) Split approach — Option 2A (recommended): split with history preserved (`git filter-repo`)
+Goal: create two new repos that preserve history for their respective subtrees.
 
-This keeps commit history for each new repo.
-
-### 2A.1 Make a safety backup (tag + optional zip)
-
-In the current monorepo:
-
-```powershell
-cd "C:\Users\tomp4\Agent Automations\sitegen-skeleton"
-
-# Tag the last monorepo state
-# (If you already made this tag, git will complain; that’s fine.)
-git tag monorepo-last
-```
-
-Optional belt-and-suspenders: create a zip copy of the folder outside git.
+### 2A.1 Make a safety backup
+- [x] Tag last monorepo state in the current repo:
+  - `git tag monorepo-last`
+- [x] Optional: create a zip copy of the workspace as a backup
 
 ### 2A.2 Create two fresh working clones
+- [x] Create sibling clones (example PowerShell):
+  - `$P = "C:\Users\tomp4\Agent Automations\split-work"`
+  - `git clone "C:\Users\tomp4\Agent Automations\sitegen-skeleton" "$P\skeleton"`
+  - `git clone "C:\Users\tomp4\Agent Automations\sitegen-skeleton" "$P\agent"`
 
-Create sibling folders:
+### 2A.3 Create `sitegen-skeleton` repo (remove agent subtree)
+- [x] In the skeleton clone, remove the `sitegen-agent` subtree from history:
+  - `git filter-repo --path sitegen-agent --invert-paths`
+- [x] Sanity check skeleton build locally:
+  - `npm ci`
+  - `npm run validate:plan`
+  - `npm run build`
 
-- `...\split-work\skeleton`
-- `...\split-work\agent`
-
-Then:
-
-```powershell
-# Pick a parent folder you like; example:
-$P = "C:\Users\tomp4\Agent Automations\split-work"
-New-Item -ItemType Directory -Force -Path $P | Out-Null
-
-git clone "C:\Users\tomp4\Agent Automations\sitegen-skeleton" "$P\skeleton"
-git clone "C:\Users\tomp4\Agent Automations\sitegen-skeleton" "$P\agent"
-```
-
-(Yes, cloning from a local path works.)
-
-### 2A.3 Create the new `sitegen-skeleton` repo (remove agent subtree)
-
-In the `skeleton` clone:
-
-```powershell
-cd "$P\skeleton"
-
-# Remove the agent subtree from history
-# (Repeat: this rewrites history in THIS clone only.)
-git filter-repo --path sitegen-agent --invert-paths
-
-# Optional: keep docker-compose.adk.yml with agent instead of skeleton
-# git filter-repo --path docker-compose.adk.yml --invert-paths
-```
-
-Sanity check:
-
-```powershell
-npm ci
-npm run validate:plan
-npm run build
-```
-
-### 2A.4 Create the new `sitegen-agent` repo (keep only agent subtree)
-
-In the `agent` clone:
-
-```powershell
-cd "$P\agent"
-
-# Keep only the agent subtree
-# This rewrites history in THIS clone only.
-git filter-repo --path sitegen-agent
-```
-
-Now promote `sitegen-agent/` contents to repo root.
-
-```powershell
-# Move everything under sitegen-agent/ up to the repo root
-# (PowerShell moves folders and files)
-Get-ChildItem -Force sitegen-agent | ForEach-Object {
-  Move-Item -Force $_.FullName .
-}
-Remove-Item -Recurse -Force sitegen-agent
-```
-
-After promotion, you should have:
-
-- `pyproject.toml`
-- `sitegen_agent/`
-- `adk/`
-- `tests/`
-- `Dockerfile`
-
-(If names differ slightly, adjust.)
+### 2A.4 Create `sitegen-agent` repo (keep only agent subtree)
+- [x] In the agent clone, keep only `sitegen-agent` subtree:
+  - `git filter-repo --path sitegen-agent`
+- [x] Promote `sitegen-agent/` contents to repo root (PowerShell example):
+  - `Get-ChildItem -Force sitegen-agent | ForEach-Object { Move-Item -Force $_.FullName . }`
+  - `Remove-Item -Recurse -Force sitegen-agent`
+- [ x Verify expected root files exist (pyproject.toml, sitegen_agent/, adk/, tests/, Dockerfile)
 
 ---
 
 ## 3) GitHub setup (both repos)
-
-1. Create **two private** repos on GitHub (under your personal account):
-   - `sitegen-skeleton`
-   - `sitegen-agent`
-2. Add remotes and push.
-
-Example:
-
-```powershell
-# In split-work\skeleton
-cd "$P\skeleton"
-git remote remove origin 2>$null
-# Replace <GITHUB_USERNAME> with your username
-git remote add origin https://github.com/<GITHUB_USERNAME>/sitegen-skeleton.git
-git push -u origin main --tags
-
-# In split-work\agent
-cd "$P\agent"
-git remote remove origin 2>$null
-# Replace <GITHUB_USERNAME> with your username
-git remote add origin https://github.com/<GITHUB_USERNAME>/sitegen-agent.git
-git push -u origin main --tags
-```
+- [x] Create two private repos on GitHub under your account:
+  - `sitegen-skeleton`
+  - `sitegen-agent`
+- [x] Push split clones to GitHub (PowerShell examples):
+  - In skeleton clone:
+    - `git remote remove origin 2>$null`
+    - `git remote add origin https://github.com/<GITHUB_USERNAME>/sitegen-skeleton.git`
+    - `git push -u origin main --tags`
+  - In agent clone:
+    - `git remote remove origin 2>$null`
+    - `git remote add origin https://github.com/<GITHUB_USERNAME>/sitegen-agent.git`
+    - `git push -u origin main --tags`
 
 ---
 
 ## 5) WebStorm: keep both repos in one project
+- [x] Create workspace layout:
+  - `sitegen-workspace/`
+    - `sitegen-skeleton/`
+    - `sitegen-agent/`
+- [x] Open `sitegen-workspace/` in WebStorm so both repos are available in one project (confirmed done)
 
-Recommended layout:
+---
 
-```
-sitegen-workspace/
-  sitegen-skeleton/
-  sitegen-agent/
-```
+## 6) CI/CD for `sitegen-skeleton` (keep skeleton stable and buildable)
+- [x] Minimum workflows to add to `sitegen-skeleton`:
+  - PR workflow: run `npm ci` then `npm run build` (created at `.github/workflows/pr.yml`)
+  - main workflow: run `npm ci` then `npm run build` (created at `.github/workflows/main.yml`)
+- [ ] Optional: PR preview deploys for skeleton changes (use OIDC and IAM if needed)
 
-Open **`sitegen-workspace/`** in WebStorm.
+## 6.2 CI/CD for `sitegen-agent` (deploy)
+- [x] Add PR workflow: run `pytest`
+- [x] Add main workflow: build image + deploy to Cloud Run via OIDC (Workload Identity Federation)
+- [ ] Configure GitHub repo variables/secrets and GCP WIF + IAM (see `docs/CI_CD_CLOUD_RUN.md`)
+
 
 ---
 
 ## 7) Cloud Run agent changes: A1 runtime `git clone` of private skeleton (required)
+Goal: ensure the agent can fetch the skeleton at runtime without relying on `/workspace`.
 
-Because both repos are private, Cloud Run must authenticate to GitHub.
+**📖 See detailed guide**: [CLOUD_RUN_DEPLOY.md](./CLOUD_RUN_DEPLOY.md)
 
-### 7.1 Add agent env vars
-
-Configure these env vars on Cloud Run:
-
-- `SITEGEN_SKELETON_GIT_URL`:
-  - `https://github.com/<GITHUB_USERNAME>/sitegen-skeleton.git`
-- `SITEGEN_SKELETON_REF` (branch pin for now):
-  - `main`
+### 7.1 Env vars to configure on Cloud Run
+- [ ] `SITEGEN_SKELETON_GIT_URL` (example: `https://github.com/Devagram/skeleton.git`)
+- [ ] `SITEGEN_SKELETON_REF` (branch pin, example: `main`)
+- [ ] `SITEGEN_SKELETON_DIR` (optional baked-in path fallback)
 
 ### 7.2 Provide GitHub credentials securely (Secret Manager)
-
-Recommended: store a GitHub token in Secret Manager and inject it as an env var.
-
-- Secret name example: `github-readonly-token`
-- Env var example: `GITHUB_TOKEN`
-
-Token guidance:
-
-- Prefer a **fine-grained personal access token** with **read-only** access scoped to:
-  - Repository: `sitegen-skeleton`
-  - Permissions: Contents (Read)
-- Set an expiration date and rotate it later.
-
-Then the agent should clone using **token-in-URL** (runtime only):
-
-- `https://x-access-token:${GITHUB_TOKEN}@github.com/<GITHUB_USERNAME>/sitegen-skeleton.git`
-
-Notes:
-
-- Never commit tokens.
-- If you later create a GitHub org or GitHub App, switch to that auth method (more scalable).
+- [ ] Create a Secret in Secret Manager (example name: `github-readonly-token`)
+- [ ] Inject secret as env var `GITHUB_TOKEN` into Cloud Run
+- [ ] Use a fine-grained, read-only token scoped to repository contents and rotate it periodically
 
 ### 7.3 Pipeline behavior (post-split)
-
-Update the agent pipeline so that:
-
-1. If request includes `skeletonPath`: use it (only for local dev)
-2. Else: clone from `SITEGEN_SKELETON_GIT_URL` at `SITEGEN_SKELETON_REF` into `/tmp` and build from there
-
-This removes the Cloud Run dependency on `/workspace`.
+- [x] Pipeline should follow this resolution order:
+  1. If request includes `skeletonPath`: use it (local/dev)
+  2. Else if `SITEGEN_SKELETON_GIT_URL` is set: clone that repo at `SITEGEN_SKELETON_REF` into a temp dir and use the clone
+  3. Else fall back to `SITEGEN_SKELETON_DIR` or baked-in locations
+- [x] Implemented in `sitegen_agent/pipeline.py` with `_clone_skeleton_into_workdir()` helper
 
 ---
 
 ## 9) Post-split verification checklist
-
 ### Skeleton repo
-
-- `npm ci`
-- `npm run validate:plan`
-- `npm run build`
+- [x] `npm ci`
+- [x] `npm run validate:plan`
+- [x] `npm run build`
 
 ### Agent repo
-
-- Local docker:
-  - Mount sibling skeleton to `/workspace:ro` and verify `/generate_preview`
-- Cloud Run:
-  - `/whoami` works
-  - `/generate_preview` works end-to-end even without `/workspace`
+- [x] Local docker: container builds and starts, `/generate_preview` reaches Firebase deploy step
+- [x] Local docker: Firebase deploy succeeds using `FIREBASE_TOKEN` (non-interactive auth)
+- [ ] Cloud Run: `/whoami` works (health)
+- [ ] Cloud Run: `/generate_preview` works end-to-end even without `/workspace` (uses runtime clone)
 
 ---
 
 ## 10) Suggested sequencing (fastest path)
+- [ ] 1. Split with `git filter-repo` (2A) — Complete steps 2A.1 through 2A.4 above
+- [x] 2. Get both repos open in one WebStorm project
+- [x] 3. Implement A1 (private git clone) in the agent pipeline
+- [ ] 4. Deploy agent to Cloud Run with Secret Manager token injection (see CLOUD_RUN_DEPLOY.md)
+- [x] 5. Add CI workflows (skeleton workflows created in .github/workflows/)
 
-1. Split with `git filter-repo`.
-2. Get both repos open in one WebStorm project.
-3. Implement A1 (private git clone) in the agent pipeline.
-4. Deploy agent to Cloud Run with Secret Manager token injection.
-5. Only then add CI workflows.
+---
+
+## Summary of completed work (post-stage 5)
+
+### Completed
+- [x] **Pipeline implementation** (step 7.3): Added `_clone_skeleton_into_workdir()` function to `sitegen_agent/pipeline.py`
+  - Clones from `SITEGEN_SKELETON_GIT_URL` at `SITEGEN_SKELETON_REF`
+  - Supports private repos via `GITHUB_TOKEN` (injected at runtime)
+  - Falls back to local paths for dev/testing
+- [x] **CI workflows** (step 6): Created GitHub Actions workflows for skeleton repo
+  - `.github/workflows/pr.yml` — runs on pull requests
+  - `.github/workflows/main.yml` — runs on main branch pushes
+  - Both workflows: `npm ci` → `validate:plan` → `build`
+- [x] **Documentation**: Created `docs/CLOUD_RUN_DEPLOY.md` with:
+  - Step-by-step Secret Manager setup
+  - Cloud Run deployment commands
+  - Troubleshooting guide
+  - Security notes and cost optimization tips
+- [x] **Updated README**: Agent README now documents skeleton resolution precedence and new env vars
+
+### Next actions (manual steps required)
+The following steps require manual execution outside the editor:
+
+1. **Complete the repo split** (steps 2A.1-2A.4):
+   - Tag monorepo: `git tag monorepo-last`
+   - Clone twice into split-work folder
+   - Run `git filter-repo` on each clone
+   - Verify builds succeed
+
+2. **Push to GitHub** (step 3):
+   - Create `sitegen-skeleton` and `sitegen-agent` private repos on GitHub
+   - Push both clones to their respective GitHub repos
+
+3. **Deploy to Cloud Run** (step 7):
+   - Follow `docs/CLOUD_RUN_DEPLOY.md` guide
+   - Create GitHub personal access token
+   - Store token in Secret Manager
+   - Deploy agent with env vars and secret injection
+
+4. **Verify end-to-end** (step 9):
+   - Test skeleton build independently
+   - Test agent locally with docker-compose
+   - Test agent on Cloud Run without `/workspace` mount

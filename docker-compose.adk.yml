@@ -2,24 +2,32 @@ services:
   sitegen-agent:
     build:
       context: .
-      dockerfile: sitegen-agent/Dockerfile
+      dockerfile: Dockerfile
     ports:
-      - "8088:8080"
+      - "8090:8080"
     environment:
       - PORT=8080
-      - FIREBASE_PROJECT=sitegen-96189
-      - SITEGEN_PROJECT_ID=hanks-sushi-truck
-      # Vertex config
-      - GOOGLE_CLOUD_PROJECT=hanks-sushi-truck
+      # Firebase / deploy
+      - FIREBASE_PROJECT=${FIREBASE_PROJECT:-sitegen-96189}
+      - FIREBASE_TOKEN=${FIREBASE_TOKEN}
+
+      # Vertex / plan generation (only used if request omits pagePlanJson)
+      - GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT:-sitegen-96189}
       - VERTEX_LOCATION=${VERTEX_LOCATION:-us-central1}
       - VERTEX_MODEL=${VERTEX_MODEL:-gemini-2.0-flash}
-      # Auth:
-      # - Cloud Run: prefer ADC via attached service account (no GOOGLE_APPLICATION_CREDENTIALS needed).
-      # - Local docker: either mount ADC file (Option A) or mount a service-account key (Option B).
-      - GOOGLE_APPLICATION_CREDENTIALS=/var/secrets/google/service-account.json
+
+      # Skeleton resolution
+      - SITEGEN_SKELETON_DIR=${SITEGEN_SKELETON_DIR}
+      - SITEGEN_SKELETON_GIT_URL=${SITEGEN_SKELETON_GIT_URL}
+      - SITEGEN_SKELETON_REF=${SITEGEN_SKELETON_REF:-main}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+
+      # Optional: override ADK generator location
+      - SITEGEN_ADK_DIR=${SITEGEN_ADK_DIR}
+
     volumes:
-      # Mount the skeleton repo read-only; the agent copies into /tmp
-      - ./:/workspace:ro
+      # Mount the sibling skeleton repo read-only; the agent copies into /tmp
+      - ../skeleton:/workspace:ro
 
       # --- Local auth options (pick ONE) ---
       # Option A (recommended): Application Default Credentials (gcloud)
@@ -28,9 +36,10 @@ services:
       # - ${APPDATA}/gcloud/application_default_credentials.json:/root/.config/gcloud/application_default_credentials.json:ro
 
       # Option B (quick local dev / PoC): service account key (DO NOT commit)
-      # 1) Place key at: ./.secrets/sitegen-agent-key.json
-      # 2) Uncomment the line below
-      # - ./.secrets/sitegen-agent-key.json:/var/secrets/google/service-account.json:ro
+      # 1) Copy: ./.secrets/sitegen-agent-key.json.template -> ./.secrets/sitegen-agent-key.json
+      # 2) Paste the service account JSON into: ./.secrets/sitegen-agent-key.json
+      # 3) Uncomment the line below
+      - ./.secrets/sitegen-agent-key.json:/var/secrets/google/service-account.json:ro
 
       # Option C (quick local dev): Firebase CLI user credentials
       # 1) Ensure you have run: firebase login
