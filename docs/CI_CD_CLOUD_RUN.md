@@ -129,7 +129,7 @@ For project `hanks-sushi-truck`:
 
 ✅ You already confirmed the service account binding exists:
 - `roles/iam.workloadIdentityUser` granted to
-  `principalSet://iam.googleapis.com/projects/1074593120244/locations/global/workloadIdentityPools/github-pool/attribute.repository/Devagram/sitegen-agent`
+  `principalSet://iam.googleapis.com/projects/1074593120244/locations/global/workloadIdentityPools/github-pool/attribute.repository/Devagram/agent`
 
 So your **exact** `WIF_PROVIDER` value is:
 
@@ -170,7 +170,7 @@ Then grant the runtime/deployer SA access:
 
 ### E) GitHub repo variables and secrets (GitHub web UI)
 
-In `sitegen-agent` repo:
+In `Devagram/agent` repo:
 
 **Settings → Secrets and variables → Actions → Variables**:
 - `GCP_PROJECT_ID=hanks-sushi-truck`

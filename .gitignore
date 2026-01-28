@@ -24,3 +24,6 @@ pnpm-debug.log*
 
 # Local secrets (DO NOT COMMIT)
 .secrets/sitegen-agent-key.json
+
+# Local token file used to create/update Secret Manager secret
+repo-token.txt
