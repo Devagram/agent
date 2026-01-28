@@ -24,7 +24,7 @@ jobs:
       VERTEX_LOCATION: ${{ vars.VERTEX_LOCATION }}
       VERTEX_MODEL: ${{ vars.VERTEX_MODEL }}
       REPO_TOKEN_SECRET: ${{ vars.REPO_TOKEN_SECRET }}
-      AR_REPO: ${{ vars.AR_REPO }}
+      AR_REPO: ${{ vars.AR_REPO || 'sitegen' }}
 
     steps:
       - name: Checkout
