@@ -1,0 +1,6 @@
+components
+layouts
+lib
+pages
+sections
+styles

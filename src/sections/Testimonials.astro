@@ -1,0 +1,96 @@
+---
+import type { Section } from '../lib/schema';
+
+type Props = Extract<Section, { type: 'testimonials' }>;
+
+const { variant, props } = Astro.props as Props;
+const { headline, items } = props;
+---
+
+<section class={`testimonials testimonials--${variant}`}>
+  <div class="wrap">
+    {headline ? (
+      <header class="testimonials__header">
+        <h2>{headline}</h2>
+      </header>
+    ) : null}
+
+    <div class="testimonials__grid" role="list">
+      {items.map((t) => (
+        <figure class="testimonial" role="listitem">
+          <blockquote>
+            <p>“{t.quote}”</p>
+          </blockquote>
+          <figcaption>
+            <div class="testimonial__author">{t.author}</div>
+            {t.role ? <div class="testimonial__role">{t.role}</div> : null}
+          </figcaption>
+        </figure>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  @import '../styles/tokens.css';
+
+  .wrap {
+    width: min(1100px, 92vw);
+    margin: 0 auto;
+    padding: var(--space-12) 0;
+  }
+
+  .testimonials__header h2 {
+    font-size: 1.75rem;
+    letter-spacing: -0.01em;
+  }
+
+  .testimonials__grid {
+    margin-top: var(--space-8);
+    display: grid;
+    gap: var(--space-6);
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .testimonials--single .testimonials__grid {
+    grid-template-columns: 1fr;
+  }
+
+  @media (max-width: 900px) {
+    .testimonials__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .testimonial {
+    margin: 0;
+    padding: var(--space-6);
+    border-radius: var(--radius-lg);
+    background: color-mix(in oklab, var(--color-accent), white 92%);
+    border: 1px solid color-mix(in oklab, var(--color-accent), black 10%);
+  }
+
+  blockquote {
+    margin: 0;
+  }
+
+  blockquote p {
+    margin: 0;
+    font-size: 1.05rem;
+    line-height: 1.6;
+  }
+
+  figcaption {
+    margin-top: var(--space-5);
+  }
+
+  .testimonial__author {
+    font-weight: 700;
+  }
+
+  .testimonial__role {
+    margin-top: var(--space-1);
+    opacity: 0.85;
+    font-size: 0.95rem;
+  }
+</style>

@@ -1,0 +1,127 @@
+---
+import type { Meta } from '../lib/schema';
+
+type Props = {
+  meta: Meta;
+};
+
+const { meta } = Astro.props as Props;
+
+const statusLabel = meta.status === 'draft'
+  ? 'Draft'
+  : meta.status === 'review'
+    ? 'In Review'
+    : 'Approved';
+---
+
+<div class="reviewBanner" role="region" aria-label="Review banner">
+  <div class="reviewBanner__inner">
+    <div class="reviewBanner__left">
+      <div class="reviewBanner__project">{meta.projectName}</div>
+      <div class="reviewBanner__meta">
+        Generated <time datetime={meta.generatedAt}>{meta.generatedAt}</time>
+      </div>
+    </div>
+
+    <div class="reviewBanner__right">
+      <span class={`badge badge--${meta.status}`}>{statusLabel}</span>
+      <div class="reviewBanner__actions">
+        <button type="button" class="btn btn--approve" disabled>
+          Approve
+        </button>
+        <button type="button" class="btn btn--changes" disabled>
+          Request Changes
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  @import '../styles/tokens.css';
+
+  .reviewBanner {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    border-bottom: 1px solid color-mix(in oklab, var(--color-accent), black 20%);
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklab, #f59e0b, white 65%),
+      color-mix(in oklab, #f59e0b, white 78%)
+    );
+    color: #111827;
+  }
+
+  .reviewBanner__inner {
+    width: min(1100px, 92vw);
+    margin: 0 auto;
+    padding: var(--space-3) 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+  }
+
+  .reviewBanner__project {
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+
+  .reviewBanner__meta {
+    font-size: 0.9rem;
+    opacity: 0.85;
+  }
+
+  .reviewBanner__right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    border: 1px solid rgba(17, 24, 39, 0.2);
+  }
+
+  .badge--draft {
+    background: rgba(255, 255, 255, 0.55);
+  }
+
+  .badge--review {
+    background: rgba(255, 255, 255, 0.75);
+  }
+
+  .badge--approved {
+    background: rgba(16, 185, 129, 0.2);
+  }
+
+  .reviewBanner__actions {
+    display: flex;
+    gap: var(--space-2);
+  }
+
+  .btn {
+    border: none;
+    border-radius: var(--radius-md);
+    padding: 0.45rem 0.7rem;
+    font-weight: 700;
+    cursor: not-allowed;
+    opacity: 0.75;
+  }
+
+  .btn--approve {
+    background: rgba(16, 185, 129, 0.25);
+  }
+
+  .btn--changes {
+    background: rgba(239, 68, 68, 0.18);
+  }
+</style>

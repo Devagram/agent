@@ -1,0 +1,16 @@
+{
+  "name": "sitegen-adk-generator",
+  "private": true,
+  "type": "module",
+  "version": "0.1.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "generate": "node src/generate-page-plan.mjs"
+  },
+  "dependencies": {
+    "@google/adk": "^0.1.0",
+    "zod": "3.25.76"
+  }
+}

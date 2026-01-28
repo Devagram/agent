@@ -1,0 +1,37 @@
+---
+import type { Section } from '../lib/schema';
+
+import Hero from './Hero.astro';
+import Services from './Services.astro';
+import About from './About.astro';
+import Testimonials from './Testimonials.astro';
+import FAQ from './FAQ.astro';
+import CTA from './CTA.astro';
+import Contact from './Contact.astro';
+
+type Props = {
+  section: Section;
+};
+
+const { section } = Astro.props as Props;
+---
+
+{section.type === 'hero' ? (
+  <Hero {...section} />
+) : section.type === 'services' ? (
+  <Services {...section} />
+) : section.type === 'about' ? (
+  <About {...section} />
+) : section.type === 'testimonials' ? (
+  <Testimonials {...section} />
+) : section.type === 'faq' ? (
+  <FAQ {...section} />
+) : section.type === 'cta' ? (
+  <CTA {...section} />
+) : section.type === 'contact' ? (
+  <Contact {...section} />
+) : (
+  (() => {
+    throw new Error(`Unknown section type: ${(section as any)?.type ?? 'undefined'}`);
+  })()
+)}

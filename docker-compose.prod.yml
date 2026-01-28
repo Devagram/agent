@@ -1,0 +1,6 @@
+services:
+  site:
+    build: .
+    command: sh -c "npm run build && npx serve -s dist -l 8080"
+    ports:
+      - "8080:8080"

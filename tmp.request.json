@@ -1,0 +1,120 @@
+{
+  "firebaseProjectId": "sitegen-96189",
+  "projectName": "hanks-sushi-truck",
+  "channelId": "trainer-r1",
+  "skeletonPath": "/workspace",
+  "pagePlanJson": {
+    "meta": {
+      "projectName": "hanks-sushi-truck",
+      "generatedAt": "2026-01-24T12:10:00Z",
+      "status": "draft"
+    },
+    "site": {
+      "title": "Ridgeway Personal Training | Stronger in 12 Weeks",
+      "description": "Personal training and coaching built around your schedule—strength, mobility, and sustainable habits.",
+      "favicon": "/favicon.svg"
+    },
+    "tokens": {
+      "colorPrimary": "#7c3aed",
+      "colorAccent": "#f97316"
+    },
+    "sections": [
+      {
+        "type": "hero",
+        "variant": "centered",
+        "props": {
+          "headline": "Get stronger. Move better. Feel confident.",
+          "subheadline": "Personal training for busy people—simple programs, real accountability, measurable progress.",
+          "ctaText": "Book a Free Consult",
+          "ctaLink": "#contact"
+        }
+      },
+      {
+        "type": "services",
+        "variant": "list",
+        "props": {
+          "headline": "Coaching options",
+          "items": [
+            {
+              "title": "1:1 personal training",
+              "description": "In-person sessions focused on strength, mobility, and injury-safe technique.",
+              "icon": "user"
+            },
+            {
+              "title": "Small group training",
+              "description": "Train with friends and stay motivated with a coach-led plan.",
+              "icon": "users"
+            },
+            {
+              "title": "Online programming",
+              "description": "Weekly workouts delivered to you with check-ins and progression tracking.",
+              "icon": "laptop"
+            }
+          ]
+        }
+      },
+      {
+        "type": "about",
+        "variant": "timeline",
+        "props": {
+          "headline": "A clear path to results",
+          "content": "Week 1–2: baseline, mobility, and movement quality. Week 3–8: progressive strength and conditioning. Week 9–12: performance and habit lock-in. You’ll always know what we’re doing and why.",
+          "image": "/images/about.jpg"
+        }
+      },
+      {
+        "type": "testimonials",
+        "variant": "single",
+        "props": {
+          "headline": "Client wins",
+          "items": [
+            {
+              "quote": "I’m stronger and my back pain is gone. The plan was simple and it actually stuck.",
+              "author": "Chris P.",
+              "role": "Desk job → consistent training"
+            }
+          ]
+        }
+      },
+      {
+        "type": "faq",
+        "variant": "simple",
+        "props": {
+          "headline": "FAQ",
+          "items": [
+            {
+              "question": "Do I need to be in shape to start?",
+              "answer": "No. We start at your level and build from there with safe progressions."
+            },
+            {
+              "question": "How often should I train?",
+              "answer": "Most clients see great results with 2–3 sessions per week plus simple at-home work."
+            },
+            {
+              "question": "Can you work around old injuries?",
+              "answer": "Yes. We prioritize technique, mobility, and exercises that respect your history."
+            }
+          ]
+        }
+      },
+      {
+        "type": "cta",
+        "variant": "minimal",
+        "props": {
+          "headline": "Ready to start?",
+          "ctaText": "Schedule a Consult",
+          "ctaLink": "#contact"
+        }
+      },
+      {
+        "type": "contact",
+        "variant": "form",
+        "props": {
+          "headline": "Contact",
+          "email": "coach@ridgewaytraining.example",
+          "formAction": "https://example.com/contact"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,100 @@
+---
+import type { Section } from '../lib/schema';
+
+type Props = Extract<Section, { type: 'faq' }>;
+
+const { variant, props } = Astro.props as Props;
+const { headline, items } = props;
+---
+
+<section class={`faq faq--${variant}`}>
+  <div class="wrap">
+    {headline ? <h2>{headline}</h2> : null}
+
+    {variant === 'accordion' ? (
+      <div class="faq__accordion">
+        {items.map((i, idx) => (
+          <details class="faq__item" open={idx === 0}>
+            <summary>{i.question}</summary>
+            <div class="faq__answer">
+              <p>{i.answer}</p>
+            </div>
+          </details>
+        ))}
+      </div>
+    ) : (
+      <div class="faq__list" role="list">
+        {items.map((i) => (
+          <article class="faq__qa" role="listitem">
+            <h3>{i.question}</h3>
+            <p>{i.answer}</p>
+          </article>
+        ))}
+      </div>
+    )}
+  </div>
+</section>
+
+<style>
+  .wrap {
+    width: min(1100px, 92vw);
+    margin: 0 auto;
+    padding: var(--space-12) 0;
+  }
+
+  .faq h2 {
+    font-size: 1.75rem;
+    letter-spacing: -0.01em;
+  }
+
+  .faq__accordion {
+    margin-top: var(--space-8);
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .faq__item {
+    border: 1px solid color-mix(in oklab, var(--color-primary), black 12%);
+    border-radius: var(--radius-md);
+    padding: var(--space-2) var(--space-4);
+    background: white;
+  }
+
+  summary {
+    cursor: pointer;
+    font-weight: 700;
+    padding: var(--space-2) 0;
+  }
+
+  .faq__answer {
+    padding: var(--space-2) 0 var(--space-3);
+    opacity: 0.9;
+  }
+
+  .faq__list {
+    margin-top: var(--space-8);
+    display: grid;
+    gap: var(--space-6);
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .faq--simple .faq__list {
+    grid-template-columns: 1fr;
+  }
+
+  @media (max-width: 900px) {
+    .faq__list {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .faq__qa h3 {
+    margin: 0;
+    font-size: 1.05rem;
+  }
+
+  .faq__qa p {
+    margin: var(--space-2) 0 0;
+    opacity: 0.9;
+  }
+</style>

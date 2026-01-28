@@ -1,0 +1,11 @@
+services:
+  site:
+    build: .
+    ports:
+      - "4321:4321"
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - .:/app
+      # Keep container's node_modules so Windows filesystem doesn't slow it down
+      - /app/node_modules

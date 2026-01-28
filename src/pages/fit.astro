@@ -1,0 +1,32 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { loadPagePlan } from '../lib/loadPagePlan';
+import ErrorDisplay from '../components/ErrorDisplay.astro';
+import ReviewBanner from '../components/ReviewBanner.astro';
+import SectionRenderer from '../sections/SectionRenderer.astro';
+
+const pagePlanResult = await loadPagePlan();
+---
+
+{pagePlanResult.ok ? (
+  <BaseLayout
+    title={`Fit — ${pagePlanResult.data.site.title}`}
+    siteTitle={pagePlanResult.data.site.title}
+    description={pagePlanResult.data.site.description}
+    favicon={pagePlanResult.data.site.favicon}
+    tokens={pagePlanResult.data.tokens}
+  >
+    <ReviewBanner meta={pagePlanResult.data.meta} />
+    {pagePlanResult.data.sections.map((section) => (
+      <SectionRenderer section={section} />
+    ))}
+  </BaseLayout>
+) : (
+  <BaseLayout title="Fit — Error">
+    <ErrorDisplay
+      title="Page plan error"
+      message={pagePlanResult.error.message}
+      details={pagePlanResult.error.details}
+    />
+  </BaseLayout>
+)}

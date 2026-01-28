@@ -1,0 +1,239 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/sitegen/page_plan.schema.json",
+  "title": "sitegen-skeleton Page Plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["meta", "site", "tokens", "sections"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Optional JSON Schema reference for editor tooling"
+    },
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["projectName", "generatedAt", "status"],
+      "properties": {
+        "projectName": { "type": "string", "minLength": 1 },
+        "generatedAt": {
+          "type": "string",
+          "description": "ISO datetime string",
+          "minLength": 1
+        },
+        "status": { "type": "string", "enum": ["draft", "review", "approved"] }
+      }
+    },
+    "site": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "description"],
+      "properties": {
+        "title": { "type": "string", "minLength": 1 },
+        "description": { "type": "string", "minLength": 1 },
+        "favicon": { "type": "string", "minLength": 1 }
+      }
+    },
+    "tokens": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["colorPrimary", "colorAccent"],
+      "properties": {
+        "colorPrimary": { "type": "string", "minLength": 1 },
+        "colorAccent": { "type": "string", "minLength": 1 }
+      }
+    },
+    "sections": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/definitions/section" }
+    }
+  },
+  "definitions": {
+    "section": {
+      "oneOf": [
+        { "$ref": "#/definitions/hero" },
+        { "$ref": "#/definitions/services" },
+        { "$ref": "#/definitions/about" },
+        { "$ref": "#/definitions/testimonials" },
+        { "$ref": "#/definitions/faq" },
+        { "$ref": "#/definitions/cta" },
+        { "$ref": "#/definitions/contact" }
+      ]
+    },
+    "hero": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "variant", "props"],
+      "properties": {
+        "type": { "const": "hero" },
+        "variant": { "type": "string", "enum": ["centered", "split", "video-bg"] },
+        "props": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["headline"],
+          "properties": {
+            "headline": { "type": "string", "minLength": 1 },
+            "subheadline": { "type": "string", "minLength": 1 },
+            "ctaText": { "type": "string", "minLength": 1 },
+            "ctaLink": { "type": "string", "minLength": 1 },
+            "backgroundImage": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    },
+    "services": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "variant", "props"],
+      "properties": {
+        "type": { "const": "services" },
+        "variant": { "type": "string", "enum": ["grid", "list", "cards"] },
+        "props": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["headline", "items"],
+          "properties": {
+            "headline": { "type": "string", "minLength": 1 },
+            "items": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["title", "description"],
+                "properties": {
+                  "title": { "type": "string", "minLength": 1 },
+                  "description": { "type": "string", "minLength": 1 },
+                  "icon": { "type": "string", "minLength": 1 }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "about": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "variant", "props"],
+      "properties": {
+        "type": { "const": "about" },
+        "variant": { "type": "string", "enum": ["split", "centered", "timeline"] },
+        "props": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["headline", "content"],
+          "properties": {
+            "headline": { "type": "string", "minLength": 1 },
+            "content": { "type": "string", "minLength": 1 },
+            "image": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    },
+    "testimonials": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "variant", "props"],
+      "properties": {
+        "type": { "const": "testimonials" },
+        "variant": { "type": "string", "enum": ["carousel", "grid", "single"] },
+        "props": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["items"],
+          "properties": {
+            "headline": { "type": "string", "minLength": 1 },
+            "items": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["quote", "author"],
+                "properties": {
+                  "quote": { "type": "string", "minLength": 1 },
+                  "author": { "type": "string", "minLength": 1 },
+                  "role": { "type": "string", "minLength": 1 },
+                  "avatar": { "type": "string", "minLength": 1 }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "faq": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "variant", "props"],
+      "properties": {
+        "type": { "const": "faq" },
+        "variant": { "type": "string", "enum": ["accordion", "two-column", "simple"] },
+        "props": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["items"],
+          "properties": {
+            "headline": { "type": "string", "minLength": 1 },
+            "items": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["question", "answer"],
+                "properties": {
+                  "question": { "type": "string", "minLength": 1 },
+                  "answer": { "type": "string", "minLength": 1 }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "cta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "variant", "props"],
+      "properties": {
+        "type": { "const": "cta" },
+        "variant": { "type": "string", "enum": ["banner", "split", "minimal"] },
+        "props": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["headline", "ctaText", "ctaLink"],
+          "properties": {
+            "headline": { "type": "string", "minLength": 1 },
+            "subheadline": { "type": "string", "minLength": 1 },
+            "ctaText": { "type": "string", "minLength": 1 },
+            "ctaLink": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    },
+    "contact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "variant", "props"],
+      "properties": {
+        "type": { "const": "contact" },
+        "variant": { "type": "string", "enum": ["simple", "split-map", "form"] },
+        "props": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["headline"],
+          "properties": {
+            "headline": { "type": "string", "minLength": 1 },
+            "email": { "type": "string", "minLength": 1 },
+            "phone": { "type": "string", "minLength": 1 },
+            "address": { "type": "string", "minLength": 1 },
+            "formAction": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    }
+  }
+}

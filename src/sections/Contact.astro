@@ -1,0 +1,142 @@
+---
+import type { Section } from '../lib/schema';
+
+type Props = Extract<Section, { type: 'contact' }>;
+
+const { variant, props } = Astro.props as Props;
+const { headline, email, phone, address, formAction } = props;
+---
+
+<section class={`contact contact--${variant}`} id="contact">
+  <div class="wrap">
+    <header class="contact__header">
+      <h2>{headline}</h2>
+    </header>
+
+    {variant === 'form' ? (
+      <form class="contact__form" method="post" action={formAction ?? '#'}>
+        <label>
+          <span>Name</span>
+          <input name="name" autocomplete="name" required />
+        </label>
+        <label>
+          <span>Email</span>
+          <input name="email" type="email" autocomplete="email" required />
+        </label>
+        <label>
+          <span>Message</span>
+          <textarea name="message" rows={5} required></textarea>
+        </label>
+        <button class="btn" type="submit">Send</button>
+        <p class="contact__note">
+          This form is a static placeholder. Wire <code>formAction</code> to a backend if you need submissions.
+        </p>
+      </form>
+    ) : (
+      <div class="contact__details" role="list">
+        {email ? (
+          <div class="contact__item" role="listitem">
+            <div class="k">Email</div>
+            <a href={`mailto:${email}`}>{email}</a>
+          </div>
+        ) : null}
+        {phone ? (
+          <div class="contact__item" role="listitem">
+            <div class="k">Phone</div>
+            <a href={`tel:${phone}`}>{phone}</a>
+          </div>
+        ) : null}
+        {address ? (
+          <div class="contact__item" role="listitem">
+            <div class="k">Address</div>
+            <div>{address}</div>
+          </div>
+        ) : null}
+      </div>
+    )}
+  </div>
+</section>
+
+<style>
+  .wrap {
+    width: min(1100px, 92vw);
+    margin: 0 auto;
+    padding: var(--space-12) 0;
+  }
+
+  .contact__header h2 {
+    font-size: 1.75rem;
+    letter-spacing: -0.01em;
+  }
+
+  .contact__details {
+    margin-top: var(--space-8);
+    display: grid;
+    gap: var(--space-4);
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (max-width: 900px) {
+    .contact__details {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .contact__item {
+    padding: var(--space-5);
+    border-radius: var(--radius-lg);
+    border: 1px solid color-mix(in oklab, var(--color-primary), black 12%);
+    background: white;
+  }
+
+  .k {
+    font-size: 0.85rem;
+    opacity: 0.75;
+    margin-bottom: var(--space-2);
+  }
+
+  .contact a {
+    color: inherit;
+  }
+
+  .contact__form {
+    margin-top: var(--space-8);
+    display: grid;
+    gap: var(--space-4);
+    max-width: 640px;
+  }
+
+  label {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  input,
+  textarea {
+    width: 100%;
+    padding: var(--space-3);
+    border-radius: var(--radius-md);
+    border: 1px solid color-mix(in oklab, var(--color-primary), black 12%);
+  }
+
+  .btn {
+    justify-self: start;
+    padding: var(--space-3) var(--space-5);
+    border-radius: var(--radius-md);
+    border: none;
+    background: var(--color-primary);
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .btn:hover {
+    background: color-mix(in oklab, var(--color-primary), black 10%);
+  }
+
+  .contact__note {
+    margin: 0;
+    font-size: 0.9rem;
+    opacity: 0.8;
+  }
+</style>

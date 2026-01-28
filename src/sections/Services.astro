@@ -1,0 +1,98 @@
+---
+import type { Section } from '../lib/schema';
+
+type Props = Extract<Section, { type: 'services' }>;
+
+const { variant, props } = Astro.props as Props;
+const { headline, items } = props;
+---
+
+<section class={`services services--${variant}`}>
+  <div class="wrap">
+    <header class="services__header">
+      <h2>{headline}</h2>
+    </header>
+
+    <div class="services__items" role="list">
+      {items.map((item) => (
+        <article class="service">
+          <div class="service__icon" aria-hidden="true">
+            {item.icon ?? '•'}
+          </div>
+          <div>
+            <h3 class="service__title">{item.title}</h3>
+            <p class="service__desc">{item.description}</p>
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .wrap {
+    width: min(1100px, 92vw);
+    margin: 0 auto;
+    padding: var(--space-12) 0;
+  }
+
+  .services__header h2 {
+    font-size: 1.75rem;
+    letter-spacing: -0.01em;
+  }
+
+  .services__items {
+    margin-top: var(--space-8);
+    display: grid;
+    gap: var(--space-6);
+  }
+
+  .services--grid .services__items,
+  .services--cards .services__items {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (max-width: 900px) {
+    .services--grid .services__items,
+    .services--cards .services__items {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .services--list .services__items {
+    grid-template-columns: 1fr;
+  }
+
+  .service {
+    display: flex;
+    gap: var(--space-4);
+    padding: var(--space-5);
+    border-radius: var(--radius-lg);
+    border: 1px solid color-mix(in oklab, var(--color-primary), black 12%);
+    background: white;
+  }
+
+  .services--cards .service {
+    box-shadow: var(--shadow-sm);
+  }
+
+  .service__icon {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--color-primary), white 80%);
+    display: grid;
+    place-items: center;
+    font-weight: 700;
+  }
+
+  .service__title {
+    margin: 0;
+    font-size: 1.1rem;
+  }
+
+  .service__desc {
+    margin: var(--space-2) 0 0;
+    opacity: 0.85;
+  }
+</style>

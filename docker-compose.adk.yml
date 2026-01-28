@@ -1,0 +1,38 @@
+services:
+  sitegen-agent:
+    build:
+      context: .
+      dockerfile: sitegen-agent/Dockerfile
+    ports:
+      - "8088:8080"
+    environment:
+      - PORT=8080
+      - FIREBASE_PROJECT=sitegen-96189
+      - SITEGEN_PROJECT_ID=hanks-sushi-truck
+      # Vertex config
+      - GOOGLE_CLOUD_PROJECT=hanks-sushi-truck
+      - VERTEX_LOCATION=${VERTEX_LOCATION:-us-central1}
+      - VERTEX_MODEL=${VERTEX_MODEL:-gemini-2.0-flash}
+      # Auth:
+      # - Cloud Run: prefer ADC via attached service account (no GOOGLE_APPLICATION_CREDENTIALS needed).
+      # - Local docker: either mount ADC file (Option A) or mount a service-account key (Option B).
+      - GOOGLE_APPLICATION_CREDENTIALS=/var/secrets/google/service-account.json
+    volumes:
+      # Mount the skeleton repo read-only; the agent copies into /tmp
+      - ./:/workspace:ro
+
+      # --- Local auth options (pick ONE) ---
+      # Option A (recommended): Application Default Credentials (gcloud)
+      # 1) Run: gcloud auth application-default login
+      # 2) Uncomment the line below
+      # - ${APPDATA}/gcloud/application_default_credentials.json:/root/.config/gcloud/application_default_credentials.json:ro
+
+      # Option B (quick local dev / PoC): service account key (DO NOT commit)
+      # 1) Place key at: ./.secrets/sitegen-agent-key.json
+      # 2) Uncomment the line below
+      # - ./.secrets/sitegen-agent-key.json:/var/secrets/google/service-account.json:ro
+
+      # Option C (quick local dev): Firebase CLI user credentials
+      # 1) Ensure you have run: firebase login
+      # 2) Uncomment the line below
+      # - ${APPDATA}/configstore/firebase-tools.json:/root/.config/configstore/firebase-tools.json:ro

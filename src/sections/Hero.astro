@@ -1,0 +1,132 @@
+---
+import type { Section } from '../lib/schema';
+
+type Props = Extract<Section, { type: 'hero' }>;
+
+const { variant, props } = Astro.props as Props;
+const {
+  headline,
+  subheadline,
+  ctaText,
+  ctaLink,
+  backgroundImage,
+} = props;
+---
+
+<section class={`hero hero--${variant}`}>
+  <div class="hero__inner">
+    <div class="hero__content">
+      <h1>{headline}</h1>
+      {subheadline ? <p class="hero__subheadline">{subheadline}</p> : null}
+      {ctaText && ctaLink ? (
+        <a class="btn" href={ctaLink}>
+          {ctaText}
+        </a>
+      ) : null}
+    </div>
+
+    {variant === 'split' || variant === 'video-bg' ? (
+      <div class="hero__media">
+        {variant === 'video-bg' ? (
+          <div class="hero__video" aria-hidden="true">
+            <div class="hero__videoPlaceholder">Video background</div>
+          </div>
+        ) : backgroundImage ? (
+          <img class="hero__image" src={backgroundImage} alt="" loading="eager" />
+        ) : null}
+      </div>
+    ) : null}
+  </div>
+</section>
+
+<style>
+  @import '../styles/tokens.css';
+
+  .hero {
+    padding: var(--space-12) 0;
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--color-primary), white 85%),
+      transparent
+    );
+  }
+
+  .hero__inner {
+    width: min(1100px, 92vw);
+    margin: 0 auto;
+    display: grid;
+    gap: var(--space-10);
+    align-items: center;
+  }
+
+  .hero--centered .hero__inner {
+    text-align: center;
+    justify-items: center;
+  }
+
+  .hero--split .hero__inner,
+  .hero--video-bg .hero__inner {
+    grid-template-columns: 1.2fr 0.8fr;
+  }
+
+  @media (max-width: 860px) {
+    .hero--split .hero__inner,
+    .hero--video-bg .hero__inner {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .hero h1 {
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+
+  .hero__subheadline {
+    margin-top: var(--space-4);
+    font-size: 1.125rem;
+    opacity: 0.9;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: var(--space-6);
+    padding: var(--space-3) var(--space-5);
+    border-radius: var(--radius-md);
+    background: var(--color-primary);
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .btn:hover {
+    background: color-mix(in oklab, var(--color-primary), black 10%);
+  }
+
+  .hero__media {
+    display: grid;
+    justify-items: end;
+  }
+
+  .hero__image {
+    width: 100%;
+    max-width: 520px;
+    height: auto;
+    border-radius: var(--radius-lg);
+    border: 1px solid color-mix(in oklab, var(--color-primary), black 15%);
+  }
+
+  .hero__videoPlaceholder {
+    width: 100%;
+    max-width: 520px;
+    aspect-ratio: 16 / 10;
+    border-radius: var(--radius-lg);
+    background: color-mix(in oklab, var(--color-accent), white 80%);
+    display: grid;
+    place-items: center;
+    font-weight: 600;
+    opacity: 0.8;
+  }
+</style>

@@ -1,0 +1,32 @@
+{
+  "name": "sitegen-skeleton",
+  "type": "module",
+  "version": "0.0.1",
+  "engines": {
+    "node": ">=20.19.0 <21"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "setup": "npm ci",
+    "start:prod": "npm run build && npx serve -s dist -l 8080",
+    "validate:plan": "tsx scripts/validate-page-plan.mjs valid",
+    "validate:plan:invalid": "tsx scripts/validate-page-plan.mjs invalid",
+    "validate:plan:missing": "tsx scripts/validate-page-plan.mjs missing",
+    "deploy:preview": "node scripts/deploy-preview.mjs"
+  },
+  "dependencies": {
+    "astro": "^5.0.0",
+    "zod": "3.25.76"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.6",
+    "@types/node": "25.0.10",
+    "serve": "^14.2.0",
+    "tsx": "^4.20.5",
+    "typescript": "^5.0.0"
+  }
+}

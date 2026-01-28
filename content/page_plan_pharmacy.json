@@ -1,0 +1,131 @@
+{
+  "meta": {
+    "projectName": "Southside Pharmacy",
+    "generatedAt": "2026-01-24T12:05:00Z",
+    "status": "review"
+  },
+  "site": {
+    "title": "Southside Pharmacy | Refills, Vaccines, Delivery",
+    "description": "Friendly neighborhood pharmacy offering fast refills, vaccinations, and local delivery.",
+    "favicon": "/favicon.svg"
+  },
+  "tokens": {
+    "colorPrimary": "#0ea5e9",
+    "colorAccent": "#22c55e"
+  },
+  "sections": [
+    {
+      "type": "hero",
+      "variant": "split",
+      "props": {
+        "headline": "Refills and care—right around the corner.",
+        "subheadline": "Fast prescriptions, walk-in vaccines, and local delivery from your neighborhood team.",
+        "ctaText": "Request a Refill",
+        "ctaLink": "#contact",
+        "backgroundImage": "/images/hero.jpg"
+      }
+    },
+    {
+      "type": "services",
+      "variant": "cards",
+      "props": {
+        "headline": "Pharmacy services",
+        "items": [
+          {
+            "title": "Prescription refills",
+            "description": "Quick refills with text reminders and easy transfers.",
+            "icon": "repeat"
+          },
+          {
+            "title": "Vaccinations",
+            "description": "Flu, COVID, shingles, and more—walk-ins welcome.",
+            "icon": "shield"
+          },
+          {
+            "title": "Local delivery",
+            "description": "Convenient delivery options for qualifying neighborhoods.",
+            "icon": "truck"
+          }
+        ]
+      }
+    },
+    {
+      "type": "about",
+      "variant": "centered",
+      "props": {
+        "headline": "A pharmacy that knows your name",
+        "content": "Southside Pharmacy is a locally owned, independent pharmacy focused on personal service. We work closely with your providers, answer questions clearly, and help you stay on track with your medications.",
+        "image": "/images/about.jpg"
+      }
+    },
+    {
+      "type": "testimonials",
+      "variant": "grid",
+      "props": {
+        "headline": "Loved by our community",
+        "items": [
+          {
+            "quote": "They always have my refill ready and take the time to explain everything.",
+            "author": "Maria R.",
+            "role": "Patient"
+          },
+          {
+            "quote": "Walked in for a flu shot—super friendly and fast.",
+            "author": "James T.",
+            "role": "Customer"
+          },
+          {
+            "quote": "Delivery made it so much easier for my parents. Great service.",
+            "author": "Anika S.",
+            "role": "Caregiver"
+          }
+        ]
+      }
+    },
+    {
+      "type": "faq",
+      "variant": "two-column",
+      "props": {
+        "headline": "Common questions",
+        "items": [
+          {
+            "question": "Can you transfer my prescription from another pharmacy?",
+            "answer": "Yes. Share your current pharmacy info and we’ll handle the transfer for you."
+          },
+          {
+            "question": "Do you accept walk-ins for vaccines?",
+            "answer": "Often yes. Availability varies—contact us to confirm same-day options."
+          },
+          {
+            "question": "How does delivery work?",
+            "answer": "We offer local delivery in select areas. Ask about eligibility and timing when you contact us."
+          },
+          {
+            "question": "What insurance plans do you accept?",
+            "answer": "We accept most major plans. If you’re unsure, contact us and we’ll verify coverage."
+          }
+        ]
+      }
+    },
+    {
+      "type": "cta",
+      "variant": "split",
+      "props": {
+        "headline": "Need a refill or vaccine today?",
+        "subheadline": "Send a quick message and our team will follow up shortly.",
+        "ctaText": "Contact Southside Pharmacy",
+        "ctaLink": "#contact"
+      }
+    },
+    {
+      "type": "contact",
+      "variant": "split-map",
+      "props": {
+        "headline": "Contact",
+        "email": "hello@southsidepharmacy.example",
+        "phone": "(555) 555-0199",
+        "address": "101 Southside Ave, Austin, TX"
+      }
+    }
+  ]
+}

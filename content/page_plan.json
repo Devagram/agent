@@ -1,0 +1,122 @@
+{
+  "meta": {
+    "projectName": "OSO Strength & Performance",
+    "generatedAt": "2026-01-24T21:20:00Z",
+    "status": "review"
+  },
+  "site": {
+    "title": "OSO Strength & Performance | Personal Training & Athletic Development",
+    "description": "Strength training, performance coaching, and sustainable habits for busy adults and athletes.",
+    "favicon": "/favicon.svg"
+  },
+  "tokens": {
+    "colorPrimary": "#7c3aed",
+    "colorAccent": "#22c55e"
+  },
+  "sections": [
+    {
+      "type": "hero",
+      "variant": "split",
+      "props": {
+        "headline": "Train with purpose. Perform with confidence.",
+        "subheadline": "OSO Strength & Performance helps you build real strength, move better, and stay consistent—with coaching that fits your life.",
+        "ctaText": "Book a Free Assessment",
+        "ctaLink": "#contact",
+        "backgroundImage": "/images/oso/ChatGPT Image Nov 30, 2025, 01_38_38 PM.png"
+      }
+    },
+    {
+      "type": "services",
+      "variant": "cards",
+      "props": {
+        "headline": "Programs",
+        "items": [
+          {
+            "title": "1:1 Coaching",
+            "description": "Individualized strength training with technique-first progressions.",
+            "icon": "user"
+          },
+          {
+            "title": "Small Group Training",
+            "description": "High energy sessions that keep you accountable and consistent.",
+            "icon": "users"
+          },
+          {
+            "title": "Performance & Athletic Development",
+            "description": "Speed, power, and mobility work that transfers to your sport.",
+            "icon": "zap"
+          }
+        ]
+      }
+    },
+    {
+      "type": "about",
+      "variant": "split",
+      "props": {
+        "headline": "Coaching that meets you where you are",
+        "content": "Every plan starts with an assessment and a clear path forward. We focus on fundamentals—strength, mobility, and conditioning—then build intensity as you earn it. No gimmicks. Just smart training and steady progress.",
+        "image": "/images/oso/OSO Strength+Performance  text logo in dark gray and purple (1).jpg"
+      }
+    },
+    {
+      "type": "testimonials",
+      "variant": "carousel",
+      "props": {
+        "headline": "Real results",
+        "items": [
+          {
+            "quote": "I finally feel strong and athletic again. The coaching is supportive and structured.",
+            "author": "Taylor M.",
+            "role": "General fitness"
+          },
+          {
+            "quote": "My lifts went up and my nagging knee pain improved because we fixed my movement.",
+            "author": "Jordan K.",
+            "role": "Strength training"
+          }
+        ]
+      }
+    },
+    {
+      "type": "faq",
+      "variant": "accordion",
+      "props": {
+        "headline": "FAQ",
+        "items": [
+          {
+            "question": "Do I need training experience to start?",
+            "answer": "No. We start at your current level and build from there with clear progressions."
+          },
+          {
+            "question": "How often should I train?",
+            "answer": "Most clients do best with 2–3 sessions per week plus a simple plan between sessions."
+          },
+          {
+            "question": "Can you help with mobility or old injuries?",
+            "answer": "Yes. We’ll tailor exercises to your history and prioritize safe technique and range of motion."
+          }
+        ]
+      }
+    },
+    {
+      "type": "cta",
+      "variant": "banner",
+      "props": {
+        "headline": "Ready to get started?",
+        "subheadline": "Book a free assessment and leave with a clear plan for your next 12 weeks.",
+        "ctaText": "Schedule Now",
+        "ctaLink": "#contact"
+      }
+    },
+    {
+      "type": "contact",
+      "variant": "simple",
+      "props": {
+        "headline": "Contact",
+        "email": "hello@osostrength.example",
+        "phone": "(555) 555-0142",
+        "address": "Austin, TX"
+      }
+    }
+  ]
+}

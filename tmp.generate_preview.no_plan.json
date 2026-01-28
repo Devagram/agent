@@ -1,0 +1,11 @@
+﻿{
+    "projectName":  "hanks-sushi-truck",
+    "firebaseProjectId":  "sitegen-96189",
+    "channelId":  "hanks-sushi-truck-r2",
+    "services":  [
+                     "Catering",
+                     "Lunch service"
+                 ],
+    "brandNotes":  "Friendly, fast, great sushi rolls.",
+    "location":  "Austin, TX"
+}

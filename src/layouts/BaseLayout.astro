@@ -1,0 +1,63 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  /** Page title (falls back to siteTitle if provided). */
+  title?: string;
+  /** Site-level title from the page plan. */
+  siteTitle?: string;
+  /** Site-level description from the page plan. */
+  description?: string;
+  /** Optional favicon path from the page plan. */
+  favicon?: string;
+  /** Optional token overrides (CSS variables). */
+  tokens?: Partial<{
+    colorPrimary: string;
+    colorAccent: string;
+  }>;
+}
+
+const {
+  title,
+  siteTitle,
+  description,
+  favicon,
+  tokens,
+} = Astro.props as Props;
+
+const documentTitle = title ?? siteTitle ?? 'Site';
+
+const tokenStyle = tokens
+  ? Object.entries(tokens)
+      .filter(([, v]) => typeof v === 'string' && v.length > 0)
+      .map(([k, v]) => {
+        const cssVar = k === 'colorPrimary' ? '--color-primary' : k === 'colorAccent' ? '--color-accent' : null;
+        return cssVar ? `${cssVar}: ${v};` : null;
+      })
+      .filter(Boolean)
+      .join(' ')
+  : '';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content={description ?? 'Astro description'} />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href={favicon ?? '/favicon.svg'} />
+    <meta name="generator" content={Astro.generator} />
+    <title>{documentTitle}</title>
+  </head>
+  <body style={tokenStyle || undefined}>
+    <header>
+      <nav>
+        <a href="/">Home</a>
+        <a href="/fit">Fit</a>
+      </nav>
+    </header>
+    <main>
+      <slot />
+    </main>
+  </body>
+</html>

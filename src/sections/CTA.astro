@@ -1,0 +1,82 @@
+---
+import type { Section } from '../lib/schema';
+
+type Props = Extract<Section, { type: 'cta' }>;
+
+const { variant, props } = Astro.props as Props;
+const { headline, subheadline, ctaText, ctaLink } = props;
+---
+
+<section class={`cta cta--${variant}`}>
+  <div class="wrap">
+    <div class="cta__inner">
+      <div class="cta__copy">
+        <h2>{headline}</h2>
+        {subheadline ? <p>{subheadline}</p> : null}
+      </div>
+      <div class="cta__actions">
+        <a class="btn" href={ctaLink}>{ctaText}</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .wrap {
+    width: min(1100px, 92vw);
+    margin: 0 auto;
+    padding: var(--space-12) 0;
+  }
+
+  .cta__inner {
+    display: grid;
+    gap: var(--space-6);
+    grid-template-columns: 1.4fr 0.6fr;
+    align-items: center;
+    padding: var(--space-8);
+    border-radius: var(--radius-xl);
+    background: color-mix(in oklab, var(--color-primary), white 88%);
+    border: 1px solid color-mix(in oklab, var(--color-primary), black 10%);
+  }
+
+  .cta--minimal .cta__inner {
+    background: transparent;
+    padding: 0;
+    border: none;
+  }
+
+  @media (max-width: 900px) {
+    .cta__inner {
+      grid-template-columns: 1fr;
+      text-align: center;
+      justify-items: center;
+    }
+  }
+
+  .cta h2 {
+    font-size: 1.75rem;
+    letter-spacing: -0.01em;
+  }
+
+  .cta p {
+    margin-top: var(--space-3);
+    opacity: 0.9;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-3) var(--space-5);
+    border-radius: var(--radius-md);
+    background: var(--color-accent);
+    color: white;
+    text-decoration: none;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .btn:hover {
+    background: color-mix(in oklab, var(--color-accent), black 10%);
+  }
+</style>
