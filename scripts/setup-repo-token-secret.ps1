@@ -21,6 +21,7 @@ if (!(Test-Path $TokenFile)) {
 Write-Host "Using project: $ProjectId" -ForegroundColor Cyan
 Write-Host "Secret name:  $SecretName" -ForegroundColor Cyan
 Write-Host "Granting to:  $ServiceAccountEmail" -ForegroundColor Cyan
+Write-Host "Token file:   $TokenFile" -ForegroundColor Cyan
 
 # Ensure project is set
 & gcloud config set project $ProjectId | Out-Null

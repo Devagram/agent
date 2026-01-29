@@ -1,0 +1,1 @@
+{"detail":"Command failed (2): firebase hosting:channel:deploy hanks-sushi-truck-r1 --project sitegen-96189 --json\n{\n  \"status\": \"error\",\n  \"error\": \"Failed to get Firebase project sitegen-96189. Please make sure the project exists and your account has permission to access it.\"\n}"}

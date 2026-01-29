@@ -25,6 +25,7 @@ jobs:
       VERTEX_MODEL: ${{ vars.VERTEX_MODEL }}
       REPO_TOKEN_SECRET: ${{ vars.REPO_TOKEN_SECRET }}
       AR_REPO: ${{ vars.AR_REPO || 'sitegen' }}
+      FIREBASE_TOKEN_SECRET: ${{ vars.FIREBASE_TOKEN_SECRET }}
 
     steps:
       - name: Checkout
@@ -92,6 +93,11 @@ jobs:
           if [[ -n "${VERTEX_MODEL:-}" ]]; then ENV_VARS+=" ,VERTEX_MODEL=$VERTEX_MODEL"; fi
           ENV_VARS=${ENV_VARS// /}
 
+          SECRETS="GITHUB_TOKEN=${REPO_TOKEN_SECRET}:latest"
+          if [[ -n "${FIREBASE_TOKEN_SECRET:-}" ]]; then
+            SECRETS+=",FIREBASE_TOKEN=${FIREBASE_TOKEN_SECRET}:latest"
+          fi
+
           gcloud run deploy "$CLOUD_RUN_SERVICE" \
             --image "$IMAGE" \
             --region "$GCP_REGION" \
@@ -100,4 +106,4 @@ jobs:
             --memory "2Gi" \
             --timeout "600" \
             --set-env-vars "$ENV_VARS" \
-            --set-secrets "GITHUB_TOKEN=${REPO_TOKEN_SECRET}:latest"
+            --set-secrets "$SECRETS"

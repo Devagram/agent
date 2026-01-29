@@ -26,4 +26,4 @@ pnpm-debug.log*
 .secrets/sitegen-agent-key.json
 
 # Local token file used to create/update Secret Manager secret
-repo-token.txt
+firebase-token.txt
