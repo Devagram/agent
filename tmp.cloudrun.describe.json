@@ -1,0 +1,141 @@
+﻿{
+  "apiVersion": "serving.knative.dev/v1",
+  "kind": "Service",
+  "metadata": {
+    "annotations": {
+      "run.googleapis.com/build-enable-automatic-updates": "false",
+      "run.googleapis.com/build-id": "7a0f6c8a-5fbd-4acf-a596-d8fb3b94f7ce",
+      "run.googleapis.com/build-image-uri": "us-central1-docker.pkg.dev/hanks-sushi-truck/cloud-run-source-deploy/sitegen-agent",
+      "run.googleapis.com/build-name": "projects/1074593120244/locations/us-central1/builds/7a0f6c8a-5fbd-4acf-a596-d8fb3b94f7ce",
+      "run.googleapis.com/build-source-location": "gs://run-sources-hanks-sushi-truck-us-central1/services/sitegen-agent/1769384711.076894-d7faff0dd1624a2fb75d09fc78b31149.zip#1769384714944037",
+      "run.googleapis.com/client-name": "gcloud",
+      "run.googleapis.com/client-version": "552.0.0",
+      "run.googleapis.com/ingress": "all",
+      "run.googleapis.com/ingress-status": "all",
+      "run.googleapis.com/maxScale": "20",
+      "run.googleapis.com/operation-id": "91461f1e-263f-4f13-a27d-830715b7d072",
+      "run.googleapis.com/urls": "[\"https://sitegen-agent-1074593120244.us-central1.run.app\",\"https://sitegen-agent-mlijlv7unq-uc.a.run.app\"]",
+      "serving.knative.dev/creator": "Tomp.45A@gmail.com",
+      "serving.knative.dev/lastModifier": "sitegen-agent-runner@hanks-sushi-truck.iam.gserviceaccount.com"
+    },
+    "creationTimestamp": "2026-01-25T22:34:50.861161Z",
+    "generation": 8,
+    "labels": {
+      "cloud.googleapis.com/location": "us-central1"
+    },
+    "name": "sitegen-agent",
+    "namespace": "1074593120244",
+    "resourceVersion": "AAZJiCrYGVI",
+    "selfLink": "/apis/serving.knative.dev/v1/namespaces/1074593120244/services/sitegen-agent",
+    "uid": "9bb853e2-132b-40f2-9bc7-a40d1b602a39"
+  },
+  "spec": {
+    "template": {
+      "metadata": {
+        "annotations": {
+          "autoscaling.knative.dev/maxScale": "20",
+          "run.googleapis.com/client-name": "gcloud",
+          "run.googleapis.com/client-version": "552.0.0",
+          "run.googleapis.com/startup-cpu-boost": "true"
+        },
+        "labels": {
+          "client.knative.dev/nonce": "qqzhhyxrtu",
+          "run.googleapis.com/startupProbeType": "Default"
+        }
+      },
+      "spec": {
+        "containerConcurrency": 80,
+        "containers": [
+          {
+            "env": [
+              {
+                "name": "GOOGLE_CLOUD_PROJECT",
+                "value": "hanks-sushi-truck"
+              },
+              {
+                "name": "SITEGEN_SKELETON_GIT_URL",
+                "value": "https://github.com/Devagram/skeleton.git"
+              },
+              {
+                "name": "SITEGEN_SKELETON_REF",
+                "value": "main"
+              },
+              {
+                "name": "GITHUB_TOKEN",
+                "valueFrom": {
+                  "secretKeyRef": {
+                    "key": "latest",
+                    "name": "github-readonly-token"
+                  }
+                }
+              }
+            ],
+            "image": "us-central1-docker.pkg.dev/hanks-sushi-truck/sitegen/sitegen-agent:latest",
+            "ports": [
+              {
+                "containerPort": 8080,
+                "name": "http1"
+              }
+            ],
+            "resources": {
+              "limits": {
+                "cpu": "1000m",
+                "memory": "2Gi"
+              }
+            },
+            "startupProbe": {
+              "failureThreshold": 1,
+              "periodSeconds": 240,
+              "tcpSocket": {
+                "port": 8080
+              },
+              "timeoutSeconds": 240
+            }
+          }
+        ],
+        "serviceAccountName": "sitegen-agent-runner@hanks-sushi-truck.iam.gserviceaccount.com",
+        "timeoutSeconds": 600
+      }
+    },
+    "traffic": [
+      {
+        "latestRevision": true,
+        "percent": 100
+      }
+    ]
+  },
+  "status": {
+    "address": {
+      "url": "https://sitegen-agent-mlijlv7unq-uc.a.run.app"
+    },
+    "conditions": [
+      {
+        "lastTransitionTime": "2026-01-29T15:04:03.449170Z",
+        "status": "True",
+        "type": "Ready"
+      },
+      {
+        "lastTransitionTime": "2026-01-29T15:03:58.097273Z",
+        "status": "True",
+        "type": "ConfigurationsReady"
+      },
+      {
+        "lastTransitionTime": "2026-01-29T15:04:03.415804Z",
+        "status": "True",
+        "type": "RoutesReady"
+      }
+    ],
+    "latestCreatedRevisionName": "sitegen-agent-00008-ngf",
+    "latestReadyRevisionName": "sitegen-agent-00008-ngf",
+    "observedGeneration": 8,
+    "traffic": [
+      {
+        "latestRevision": true,
+        "percent": 100,
+        "revisionName": "sitegen-agent-00008-ngf"
+      }
+    ],
+    "url": "https://sitegen-agent-mlijlv7unq-uc.a.run.app"
+  }
+}
+
